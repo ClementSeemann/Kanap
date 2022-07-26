@@ -1,7 +1,9 @@
 const cart = [];
-
 retrieveItemsFromCache();
-cart.forEach((item) => displayItem(item));
+cart.forEach((item) => displayItem(item))
+
+const orderButton = document.querySelector("#order");
+orderButton.addEventListener("click", (e) => submitForm(e));
 
 function retrieveItemsFromCache(){
     const numberOfItems = localStorage.length;
@@ -11,6 +13,7 @@ function retrieveItemsFromCache(){
         cart.push(itemObject);
     };
 };
+
 
 function displayItem(item){
     const article = makeArticle(item);
@@ -22,6 +25,7 @@ function displayItem(item){
     displayTotalPrice();
     displayTotalQuantity();
 };
+
 
 function makeCartContent(item){
     const cardItemContent = document.createElement("div");
@@ -158,4 +162,84 @@ function deleteArticleFromPage(item){
         `article[data-id="${item.id}"][data-color="${item.color}"]`
     );
     articleToDelete.remove();
+};
+
+
+function submitForm(e){
+    e.preventDefault();
+    if (cart.length === 0) {
+        alert("Veuillez ajouter votre commande au panier svp");
+        return;
+    };
+
+    if (isEmailInvalid()) return;
+    if (isFormInvalid()) return;
+    
+
+    const body = makeRequestBody();
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json",
+        }
+    })
+        .then((res) => res.json())
+        .then((data) =>{
+            const orderId = data.orderId
+            window.location.href= "confirmation.html" + "?orderId=" + orderId
+        })
+};
+
+function isEmailInvalid(){
+    const email = document.querySelector("#email").value;
+    const regex = /^[A-Za-z0-9+_.-]+@(.+)$/;
+    if (regex.test(email) === false){
+        alert("Veuillez entrer une adresse email valide svp");
+        return true;
+    }
+    return false;
+};
+
+function isFormInvalid(){
+    const form = document.querySelector(".cart__order__form");
+    const inputs = form.querySelectorAll("input");
+    inputs.forEach((input) => {
+        if (input.value === ""){
+            alert("Veuillez compléter tous les champs svp");
+            return true;
+        }
+        return false;
+    })
+};
+
+function makeRequestBody(){
+    const form = document.querySelector(".cart__order__form");
+    const firstName = form.elements.firstName.value;
+    const lastName = form.elements.lastName.value;
+    const address = form.elements.address.value;
+    const city = form.elements.city.value;
+    const email = form.elements.email.value;
+    const body = {
+        contact: {
+            firstName: firstName,
+            lastName: lastName,
+            address: address,
+            city: city,
+            email: email
+        },
+        products: getIdsFromCache()
+    };
+    return body;
+};
+
+function getIdsFromCache(){
+    const numberOfProducts = localStorage.length;
+    const ids = [];
+    for (let i = 0; i < numberOfProducts; i++){
+        const key = localStorage.key(i);
+        const id = key.split("-")[0];
+        ids.push(id);
+    }
+    return ids;
 };
