@@ -1,7 +1,3 @@
-const orderId = getOrderId();
-displayOrderId(orderId);
-cleanAllStorage();
-
 function getOrderId(){
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -17,3 +13,7 @@ function cleanAllStorage(){
     const cache = window.localStorage;
     cache.clear();
 };
+
+const orderId = getOrderId();
+displayOrderId(orderId);
+cleanAllStorage();
