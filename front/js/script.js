@@ -1,7 +1,13 @@
+// Affichage des produits de la page d'accueil
+// Requête Fetch pour récupérer les produits de l'API
+
 fetch("http://localhost:3000/api/products")
     .then((res) => res.json())
     .then((kanaps) => addProducts(kanaps))
 
+
+// Création des fonctions d'affichage
+    
 function addProducts(kanaps){
     kanaps.forEach(kanap => {
         const {_id, imageUrl, altTxt, name, description} = kanap;

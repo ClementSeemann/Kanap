@@ -1,11 +1,12 @@
+// Affichage de la page panier avec modification et suppression des commandes
+// Définition des constantes
+
 const cart = [];
-retrieveItemsFromCache();
-cart.forEach((item) => displayItem(item))
-
 const orderButton = document.querySelector("#order");
-orderButton.addEventListener("click", (e) => submitForm(e));
 
-function retrieveItemsFromCache(){
+
+// Récupération des éléments du Local Storage
+function retrieveItemsFromStorage(){
     const numberOfItems = localStorage.length;
     for (let i = 0; i< numberOfItems; i++){
         const item = localStorage.getItem(localStorage.key(i)) || "";
@@ -14,6 +15,9 @@ function retrieveItemsFromCache(){
     };
 };
 
+retrieveItemsFromStorage();
+
+// Création des fonctions d'affichage du panier et de modification des éléments
 
 function displayItem(item){
     const article = makeArticle(item);
@@ -26,6 +30,7 @@ function displayItem(item){
     displayTotalQuantity();
 };
 
+cart.forEach((item) => displayItem(item))
 
 function makeCartContent(item){
     const cardItemContent = document.createElement("div");
@@ -146,6 +151,8 @@ function updatePriceQuantity(id, newValue, item){
     saveNewDataToCache(item);
 };
 
+// Fonctions de suppression des éléments
+
 function deleteDataFromCache(item){
     const key = `${item.id}-${item.color}`;
     localStorage.removeItem(key);
@@ -164,6 +171,7 @@ function deleteArticleFromPage(item){
     articleToDelete.remove();
 };
 
+// Création des fonctions d'utilisation du formulaire et des messages d'erreur
 
 function submitForm(e){
     e.preventDefault();
@@ -172,11 +180,13 @@ function submitForm(e){
         return;
     };
 
-    if (isEmailInvalid()) return;
     if (isFormInvalid()) return;
+    if (isEmailInvalid()) return;
     
 
     const body = makeRequestBody();
+
+    // Requête POST pour envoyer la commande client au serveur
     fetch("http://localhost:3000/api/products/order", {
         method: "POST",
         body: JSON.stringify(body),
@@ -191,6 +201,8 @@ function submitForm(e){
         })
 };
 
+orderButton.addEventListener("click", (e) => submitForm(e));
+
 function isEmailInvalid(){
     const email = document.querySelector("#email").value;
     const regex = /^[A-Za-z0-9+_.-]+@(.+)$/;
@@ -198,20 +210,30 @@ function isEmailInvalid(){
         alert("Veuillez entrer une adresse email valide svp");
         return true;
     }
-    return false;
+    else{
+        return false;
+    }
+    
 };
 
 function isFormInvalid(){
     const form = document.querySelector(".cart__order__form");
     const inputs = form.querySelectorAll("input");
-    inputs.forEach((input) => {
+    console.log(inputs)
+    for (input of inputs){
+        console.log(input.value)
         if (input.value === ""){
             alert("Veuillez compléter tous les champs svp");
             return true;
         }
-        return false;
-    })
+    }
+    return false
 };
+
+
+
+
+// Mise en forme des informations client pour la requête POST
 
 function makeRequestBody(){
     const form = document.querySelector(".cart__order__form");
@@ -232,6 +254,8 @@ function makeRequestBody(){
     };
     return body;
 };
+
+// Récupération de l'ID pour le message de confirmation de commande
 
 function getIdsFromCache(){
     const numberOfProducts = localStorage.length;

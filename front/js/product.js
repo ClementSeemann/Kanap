@@ -1,15 +1,15 @@
+// Affichage des données de la page produit
+// Définition des constantes et obtention de l'ID à partir de l'URL
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get("id");
-if (id !=null){
-    let itemPrice = 0;
-    let imgUrl, altText, articleName;
-};
 
 fetch(`http://localhost:3000/api/products/${id}`)
     .then((response) => response.json())
     .then((res) => handleData(res))
 
+
+// Création des fonctions d'affichage de la page produit    
 function handleData(kanap){
     const {altTxt, colors, description, imageUrl, name, price} = kanap;
     imgUrl = imageUrl;
@@ -21,6 +21,11 @@ function handleData(kanap){
     makePrice(price);
     makeDescription(description);
     makeColors(colors);
+};
+
+if (id !=null){
+    let itemPrice = 0;
+    let imgUrl, altText, articleName;
 };
 
 function makeImage(imageUrl, altTxt){
@@ -58,6 +63,8 @@ function makeColors(colors){
     };
 };
 
+// Ajout addEventListener pour ajouter le produit au panier en cliquant sur le bouton
+
 const button = document.querySelector("#addToCart");
 button.addEventListener("click", handleClick);
 
@@ -68,6 +75,8 @@ function handleClick(){
     saveOrder(color, quantity);
     redirectToCart();
 };
+
+// Passage du produit dans le local storage
 
 function saveOrder(color, quantity){
     const key = `${id}-${color}`
@@ -89,6 +98,8 @@ function isOrderInvalid(color, quantity){
         return true;
     };
 };
+
+// Redirection vers le panier
 
 function redirectToCart(){
     window.location.href = "cart.html";
