@@ -97,6 +97,10 @@ function isOrderInvalid(color, quantity){
         alert("Veuillez sélectionner une couleur et une quantité.");
         return true;
     };
+    if (quantity>100 || quantity<0){
+        alert("Veuillez sélectionner une quantité correcte");
+        return true;
+    }
 };
 
 // Redirection vers le panier

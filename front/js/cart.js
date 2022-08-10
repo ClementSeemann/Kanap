@@ -105,10 +105,24 @@ function addQuantityToSettings(settings, item){
     input.max = "100";
     input.value = item.quantity;
     input.addEventListener("input", () => updatePriceQuantity(item.id, input.value, item));
-
+    input.addEventListener("input", () => isQuantityInvalid(item.id, input.value, item));
     quantity.appendChild(input);
     settings.appendChild(quantity);
 };
+
+function isQuantityInvalid(id, newValue, item){
+    const itemUpdate = cart.find(item => item.id === id);
+    itemUpdate.quantity = Number(newValue);
+    item.quantity = itemUpdate.quantity;
+    if(item.quantity<0 || item.quantity>100){
+        alert("Veuillez sélectionner une quantité correcte")
+        item.quantity = 1;
+    }
+    displayTotalQuantity();
+    displayTotalPrice();
+    saveNewDataToCache(item);
+    return item.quantity
+}
 
 function addDeleteToSettings(settings, item){
     const div = document.createElement("div");
@@ -219,11 +233,18 @@ function isEmailInvalid(){
 function isFormInvalid(){
     const form = document.querySelector(".cart__order__form");
     const inputs = form.querySelectorAll("input");
+    const prenom = document.querySelector("#firstName").value;
+    const nom = document.querySelector("#lastName").value;
+    const regex = /^(?:[^\d\W][\-\s\']{0,1}){2,20}$/;
     console.log(inputs)
     for (input of inputs){
         console.log(input.value)
         if (input.value === ""){
             alert("Veuillez compléter tous les champs svp");
+            return true;
+        }
+        else if (regex.test(prenom, nom) === false){
+            alert("Veuillez entrer un nom correct svp");
             return true;
         }
     }
